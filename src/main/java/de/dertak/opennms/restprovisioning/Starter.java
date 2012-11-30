@@ -72,7 +72,7 @@ public class Starter {
                 File odsFile = new File(odsFilePath);
                 if(odsFile.exists() && odsFile.canRead()) {
                     RestCategoryProvisioner restCategoryProvisioner = new RestCategoryProvisioner(baseUrl, userName, password, odsFile, requisition, apply);
-                    restCategoryProvisioner.doThings();
+                    restCategoryProvisioner.getRequisitionNodesToUpdate();
                 }else {
                     logger.info("The odsFile '{}' dose not exist or is not readable, sorry.", odsFilePath);
                 }

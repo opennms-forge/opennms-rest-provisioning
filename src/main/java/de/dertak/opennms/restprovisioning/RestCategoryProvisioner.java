@@ -72,10 +72,10 @@ class RestCategoryProvisioner {
         this.httpClient = RestHelper.createApacheHttpClient(userName, password);
     }
 
-    public void doThings() {
+    public List<RequisitionNode> getRequisitionNodesToUpdate() {
         //create and prepare RestRequisitionManager
         requisitionManager = new RestRequisitionManager(httpClient, baseUrl);
-        requisitionManager.loadNodesByLableForRequisition(requisition);
+        requisitionManager.loadNodesByLableForRequisition(requisition, "");
 
         //read node to category mappings from spreadsheet
         SpreadsheetReader spreadsheetReader = new SpreadsheetReader();
@@ -83,6 +83,7 @@ class RestCategoryProvisioner {
 
         List<RequisitionNode> requisitionNodesToUpdate = getRequisitionNodesToUpdate(nodeToCategoryMappings, requisitionManager);
 
+        return requisitionNodesToUpdate;
     }
 
     private List<RequisitionNode> getRequisitionNodesToUpdate(List<NodeToCategoryMapping> nodeToCategoryMappings, RestRequisitionManager requisitionManager) {
