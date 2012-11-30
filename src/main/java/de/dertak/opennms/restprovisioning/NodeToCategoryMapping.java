@@ -29,6 +29,7 @@ package de.dertak.opennms.restprovisioning;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.opennms.netmgt.provision.persist.requisition.RequisitionCategory;
 
 /**
  *
@@ -36,14 +37,13 @@ import java.util.List;
  */
 public class NodeToCategoryMapping {
     String nodeLabel;
-    List<String> addCategories = new ArrayList<String>();
-    List<String> removeCategories = new ArrayList<String>();
-
+    List<RequisitionCategory> addCategories = new ArrayList<RequisitionCategory>();
+    List<RequisitionCategory> removeCategories = new ArrayList<RequisitionCategory>();
     public NodeToCategoryMapping(String nodeLabel) {
         this.nodeLabel = nodeLabel;
     }
 
-    public NodeToCategoryMapping(String nodeLable, List<String> addCategories, List<String> removeCategories) {
+    public NodeToCategoryMapping(String nodeLable, List<RequisitionCategory> addCategories, List<RequisitionCategory> removeCategories) {
         this.nodeLabel = nodeLabel;
         this.addCategories = addCategories;
         this.removeCategories = removeCategories;
@@ -57,24 +57,24 @@ public class NodeToCategoryMapping {
         this.nodeLabel = nodeLabel;
     }
 
-    public List<String> getAddCategories() {
+    public List<RequisitionCategory> getAddCategories() {
         return addCategories;
     }
 
-    public void setAddCategories(List<String> addCategories) {
+    public void setAddCategories(List<RequisitionCategory> addCategories) {
         this.addCategories = addCategories;
     }
 
-    public List<String> getRemoveCategories() {
+    public List<RequisitionCategory> getRemoveCategories() {
         return removeCategories;
     }
 
-    public void setRemoveCategories(List<String> removeCategories) {
+    public void setRemoveCategories(List<RequisitionCategory> removeCategories) {
         this.removeCategories = removeCategories;
     }
 
     @Override
     public String toString() {
-        return "NodeCategoryChange{" + "nodeLabel=" + nodeLabel + ", addCategories=" + addCategories + ", removeCategories=" + removeCategories + '}';
+        return "NodeToCategoryMapping{" + "nodeLabel=" + nodeLabel + ", addCategories=" + addCategories + ", removeCategories=" + removeCategories + '}';
     }
 }

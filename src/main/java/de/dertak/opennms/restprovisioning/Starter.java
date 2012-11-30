@@ -1,7 +1,6 @@
 package de.dertak.opennms.restprovisioning;
 
 import com.sun.jersey.client.apache.ApacheHttpClient;
-import de.dertak.opennms.restclientapi.RestRequisitionProvider;
 import de.dertak.opennms.restclientapi.helper.RestHelper;
 import de.dertak.opennms.restclientapi.manager.RestRequisitionManager;
 import java.io.File;
@@ -34,40 +33,53 @@ public class Starter {
         RestRequisitionManager requisitionManager = new RestRequisitionManager(HTTP_CLIENT, BASE_URL);
         requisitionManager.loadNodesByLableForAllRequisitions();
 
+        //read node to category mappings from spreadsheet
         SpreadsheetReader spreadsheetReader = new SpreadsheetReader();
         List<NodeToCategoryMapping> nodeToCategoryMappings = spreadsheetReader.getNodeToCategoryMappingsFromFile(ODS_FILE);
+        
+        List<RequisitionNode> requisitionNodesToUpdate = getRequisitionNodesToUpdate(nodeToCategoryMappings, requisitionManager);
+        
+        logger.info("Thanks for computing with OpenNMS!");
+    }
 
-        List<RequisitionNode> reqNodesToChange = new ArrayList<RequisitionNode>();
-        List<NodeToCategoryMapping> nodesUnknowen = new ArrayList<NodeToCategoryMapping>();
-
+    private static List<RequisitionNode> getRequisitionNodesToUpdate(List<NodeToCategoryMapping> nodeToCategoryMappings, RestRequisitionManager requisitionManager) {
+      
+        List<RequisitionNode> reqNodesToUpdate = new ArrayList<RequisitionNode>();
+       
         for(NodeToCategoryMapping node2Category : nodeToCategoryMappings) {
-            RequisitionNode reqisitionNode = requisitionManager.getReqisitionNode(node2Category.getNodeLabel());
-            if(reqisitionNode != null) {
-                List<RequisitionCategory> categories = reqisitionNode.getCategories();
-                for(String addCategorie : node2Category.addCategories) {
-                    categories.add(new RequisitionCategory(addCategorie));
+            RequisitionNode requisitionNode = requisitionManager.getReqisitionNode(node2Category.getNodeLabel());
+            if(requisitionNode != null) {
+
+                //add all set categories
+                Integer initalAmountOfCategories = requisitionNode.getCategories().size();
+                for (RequisitionCategory addCategory : node2Category.addCategories) {
+                    requisitionNode.putCategory(addCategory);
                 }
-                for(String removeCategorie : node2Category.removeCategories) {
-                    categories.remove(new RequisitionCategory(removeCategorie));
+                
+                //remove all not set categories
+                Integer afterAddingAmountOfCategories = requisitionNode.getCategories().size();
+                for (RequisitionCategory removeCategory : node2Category.removeCategories) {
+                    requisitionNode.deleteCategory(removeCategory);
                 }
-                //Not every node in this list has realy a change....
-                reqNodesToChange.add(reqisitionNode);
+                Integer afterRemoveAmountOfCategories = requisitionNode.getCategories().size();
+
+                //compare amount of categories per step to identify changed requisition nodes
+                if(initalAmountOfCategories.equals(afterAddingAmountOfCategories) && afterAddingAmountOfCategories.equals(afterRemoveAmountOfCategories)) {
+                    logger.info("RequisitionNode '{}' has no updates", requisitionNode.getNodeLabel());
+                } else {
+                    logger.info("RequisitionNode '{}' has updates", requisitionNode.getNodeLabel());
+                    reqNodesToUpdate.add(requisitionNode);
+                }
+                
             } else {
-                nodesUnknowen.add(node2Category);
+                logger.info("RequisitionNode '{}' is unknowen on the system", node2Category.nodeLabel);
             }
         }
 
-        for(RequisitionNode reqNode : reqNodesToChange) {
+        for(RequisitionNode reqNode : reqNodesToUpdate) {
             logger.info("Node to change '{}'", reqNode.getNodeLabel());
         }
 
-        for(NodeToCategoryMapping nodeToCategoryMapping : nodesUnknowen) {
-            logger.info("Node unknowen on the remote system '{}'", nodeToCategoryMapping.getNodeLabel());
-        }
-
-        for(RequisitionNode reqNode : reqNodesToChange) {
-            RestRequisitionProvider.updateRequisionNodeCategories(HTTP_CLIENT, BASE_URL, "",reqNode);
-        }
-        logger.info("Thanks for computing with OpenNMS!");
+        return reqNodesToUpdate;
     }
 }

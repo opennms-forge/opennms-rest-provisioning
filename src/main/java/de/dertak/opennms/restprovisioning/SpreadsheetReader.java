@@ -35,6 +35,7 @@ import org.odftoolkit.odfdom.doc.table.OdfTable;
 import org.odftoolkit.odfdom.doc.table.OdfTableColumn;
 import org.odftoolkit.odfdom.doc.table.OdfTableRow;
 import org.odftoolkit.odfdom.type.Color;
+import org.opennms.netmgt.provision.persist.requisition.RequisitionCategory;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -70,11 +71,11 @@ public class SpreadsheetReader {
                     for(int cellId = 1; cellId <= categories.size(); cellId++) {
                         if (table.getRowByIndex(rowIndex).getCellByIndex(cellId).getDisplayText().equals("")) {
                         table.getRowByIndex(rowIndex).getCellByIndex(cellId).setCellBackgroundColor(Color.RED);
-                            node.getRemoveCategories().add(categories.get(cellId -1));
+                            node.getRemoveCategories().add(new RequisitionCategory(categories.get(cellId -1)));
                             logger.debug("Node '{}' found removeCategory '{}'", node.getNodeLabel(),categories.get(cellId -1) );
                         } else {
                             table.getRowByIndex(rowIndex).getCellByIndex(cellId).setCellBackgroundColor(Color.GREEN);
-                            node.getAddCategories().add(categories.get(cellId -1));
+                            node.getAddCategories().add(new RequisitionCategory(categories.get(cellId -1)));
                             logger.debug("Node '{}' found addCategory    '{}'", node.getNodeLabel(),categories.get(cellId -1) );
                         }
                     }
