@@ -27,9 +27,10 @@
  *******************************************************************************/
 package de.dertak.opennms.restprovisioning;
 
+import org.opennms.netmgt.provision.persist.requisition.RequisitionCategory;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.opennms.netmgt.provision.persist.requisition.RequisitionCategory;
 
 /**
  *
@@ -43,7 +44,7 @@ public class NodeToCategoryMapping {
         this.nodeLabel = nodeLabel;
     }
 
-    public NodeToCategoryMapping(String nodeLable, List<RequisitionCategory> addCategories, List<RequisitionCategory> removeCategories) {
+    public NodeToCategoryMapping(String nodeLabel, List<RequisitionCategory> addCategories, List<RequisitionCategory> removeCategories) {
         this.nodeLabel = nodeLabel;
         this.addCategories = addCategories;
         this.removeCategories = removeCategories;

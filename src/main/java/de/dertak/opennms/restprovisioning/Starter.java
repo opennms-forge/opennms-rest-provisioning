@@ -27,13 +27,14 @@
  *******************************************************************************/
 package de.dertak.opennms.restprovisioning;
 
-import java.io.File;
-import java.io.IOException;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
 
 public class Starter {
 
@@ -54,8 +55,13 @@ public class Starter {
     @Option(name = "-requisition", required = true, usage = "name of the requisition to work with")
     private String requisition;
 
-    @Option(name = "-apply", usage = "just if this option is set, changes will be applied to the remote system.")
+    @Option(name = "-apply", usage = "if this option is set, changes will be applied to the remote system.")
     private boolean apply = false;
+
+    /**
+     * Set maximal terminal width for line breaks
+     */
+    private final int TERMINAL_WIDTH = 120;
 
     public static void main(String[] args) throws IOException {
         new Starter().doMain(args);
@@ -65,17 +71,19 @@ public class Starter {
 
         CmdLineParser parser = new CmdLineParser(this);
 
-        parser.setUsageWidth(120);
+        parser.setUsageWidth(TERMINAL_WIDTH);
+
         logger.info("OpenNMS Category Provisioning");
         try {
             parser.parseArgument(args);
-                File odsFile = new File(odsFilePath);
-                if(odsFile.exists() && odsFile.canRead()) {
-                    RestCategoryProvisioner restCategoryProvisioner = new RestCategoryProvisioner(baseUrl, userName, password, odsFile, requisition, apply);
-                    restCategoryProvisioner.getRequisitionNodesToUpdate();
-                }else {
-                    logger.info("The odsFile '{}' dose not exist or is not readable, sorry.", odsFilePath);
-                }
+            File odsFile = new File(odsFilePath);
+            if (odsFile.exists() && odsFile.canRead()) {
+                RestCategoryProvisioner restCategoryProvisioner = new RestCategoryProvisioner(baseUrl, userName, password, odsFile, requisition, apply);
+                restCategoryProvisioner.getRequisitionNodesToUpdate();
+            }
+            else {
+                logger.info("The odsFile '{}' dose not exist or is not readable, sorry.", odsFilePath);
+            }
         } catch (CmdLineException ex) {
             parser.printUsage(System.err);
         }

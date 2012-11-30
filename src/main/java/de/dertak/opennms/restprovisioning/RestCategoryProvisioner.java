@@ -30,16 +30,16 @@ package de.dertak.opennms.restprovisioning;
 import com.sun.jersey.client.apache.ApacheHttpClient;
 import de.dertak.opennms.restclientapi.helper.RestHelper;
 import de.dertak.opennms.restclientapi.manager.RestRequisitionManager;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionCategory;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- *
  * @author Markus@OpenNMS.org
  */
 class RestCategoryProvisioner {
@@ -59,7 +59,7 @@ class RestCategoryProvisioner {
     private boolean apply = false;
 
     private ApacheHttpClient httpClient;
-    
+
     private RestRequisitionManager requisitionManager;
 
     public RestCategoryProvisioner(String baseUrl, String userName, String password, File odsFile, String requisition, Boolean apply) {
@@ -75,7 +75,7 @@ class RestCategoryProvisioner {
     public List<RequisitionNode> getRequisitionNodesToUpdate() {
         //create and prepare RestRequisitionManager
         requisitionManager = new RestRequisitionManager(httpClient, baseUrl);
-        requisitionManager.loadNodesByLableForRequisition(requisition, "");
+        requisitionManager.loadNodesByLabelForRequisition(requisition, "");
 
         //read node to category mappings from spreadsheet
         SpreadsheetReader spreadsheetReader = new SpreadsheetReader();
@@ -110,13 +110,15 @@ class RestCategoryProvisioner {
                 //compare amount of categories per step to identify changed requisition nodes
                 if (initalAmountOfCategories.equals(afterAddingAmountOfCategories) && afterAddingAmountOfCategories.equals(afterRemoveAmountOfCategories)) {
                     logger.info("RequisitionNode '{}' has no updates", requisitionNode.getNodeLabel());
-                } else {
+                }
+                else {
                     logger.info("RequisitionNode '{}' has updates", requisitionNode.getNodeLabel());
                     reqNodesToUpdate.add(requisitionNode);
                 }
 
-            } else {
-                logger.info("RequisitionNode '{}' is unknowen on the system", node2Category.nodeLabel);
+            }
+            else {
+                logger.info("RequisitionNode '{}' is unknown on the system", node2Category.nodeLabel);
             }
         }
 
@@ -126,6 +128,5 @@ class RestCategoryProvisioner {
 
         return reqNodesToUpdate;
     }
-
 
 }
