@@ -95,7 +95,7 @@ class RestCategoryProvisioner {
             if (requisitionNode != null) {
 
                 //add all set categories
-                Integer initalAmountOfCategories = requisitionNode.getCategories().size();
+                Integer initialAmountOfCategories = requisitionNode.getCategories().size();
                 for (RequisitionCategory addCategory : node2Category.addCategories) {
                     requisitionNode.putCategory(addCategory);
                 }
@@ -108,7 +108,7 @@ class RestCategoryProvisioner {
                 Integer afterRemoveAmountOfCategories = requisitionNode.getCategories().size();
 
                 //compare amount of categories per step to identify changed requisition nodes
-                if (initalAmountOfCategories.equals(afterAddingAmountOfCategories) && afterAddingAmountOfCategories.equals(afterRemoveAmountOfCategories)) {
+                if (initialAmountOfCategories.equals(afterAddingAmountOfCategories) && afterAddingAmountOfCategories.equals(afterRemoveAmountOfCategories)) {
                     logger.info("RequisitionNode '{}' has no updates", requisitionNode.getNodeLabel());
                 }
                 else {
