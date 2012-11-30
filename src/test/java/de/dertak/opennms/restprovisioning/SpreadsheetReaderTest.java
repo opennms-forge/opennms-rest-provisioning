@@ -49,7 +49,7 @@ public class SpreadsheetReaderTest {
 
     @Test
     public void testGetNodeCategoryChangeFromFile() {
-        List<NodeToCategoryMapping> nodeCategoryChanges = reader.getNodeToCategoryMappingsFromFile(new File("/home/tak/test.ods"));
+        List<NodeToCategoryMapping> nodeCategoryChanges = reader.getNodeToCategoryMappingsFromFile(new File("/home/tak/test.ods"), "Threshold");
         logger.info("Got '{}' NodeCategoryChanges.",nodeCategoryChanges.size());
         for (NodeToCategoryMapping nodeCategoryChange : nodeCategoryChanges) {
             logger.info("NodeCategoryChange for '{}' found addCategory size is '{}' found remove Category size is '{}'", nodeCategoryChange.getNodeLabel(), nodeCategoryChange.getAddCategories().size(), nodeCategoryChange.getRemoveCategories().size());

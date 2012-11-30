@@ -46,13 +46,13 @@ public class SpreadsheetReader {
 
     private static org.slf4j.Logger logger = LoggerFactory.getLogger(SpreadsheetReader.class);
 
-    public List<NodeToCategoryMapping> getNodeToCategoryMappingsFromFile(File odsFile) {
+    public List<NodeToCategoryMapping> getNodeToCategoryMappingsFromFile(File odsFile, String tableName) {
         List<NodeToCategoryMapping> nodes = new LinkedList<NodeToCategoryMapping>();
         List<String> categories = new LinkedList<String>();
         if (odsFile.exists() && odsFile.canRead()) {
             try {
                 OdfSpreadsheetDocument spreadsheet = OdfSpreadsheetDocument.loadDocument(odsFile);
-                OdfTable table = spreadsheet.getTableByName("Thresholds");
+                OdfTable table = spreadsheet.getTableByName(tableName);
                 OdfTableColumn nodeColumn = table.getColumnByIndex(0);
                 OdfTableRow categoryRow = table.getRowByIndex(0);
 
