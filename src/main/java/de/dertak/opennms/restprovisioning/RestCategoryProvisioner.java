@@ -28,7 +28,6 @@
 package de.dertak.opennms.restprovisioning;
 
 import com.sun.jersey.client.apache.ApacheHttpClient;
-import de.dertak.opennms.restclientapi.helper.RestHelper;
 import de.dertak.opennms.restclientapi.manager.RestRequisitionManager;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionCategory;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionNode;
@@ -46,42 +45,36 @@ class RestCategoryProvisioner {
 
     private static Logger logger = LoggerFactory.getLogger(RestCategoryProvisioner.class);
 
-    private String baseUrl;
+    private String m_baseUrl;
 
-    private String userName;
+    private File m_odsFile;
 
-    private String password;
+    private String m_requisition;
 
-    private File odsFile;
+    private boolean m_apply = false;
 
-    private String requisition;
+    private ApacheHttpClient m_httpClient;
 
-    private boolean apply = false;
+    private RestRequisitionManager m_requisitionManager;
 
-    private ApacheHttpClient httpClient;
-
-    private RestRequisitionManager requisitionManager;
-
-    public RestCategoryProvisioner(String baseUrl, String userName, String password, File odsFile, String requisition, Boolean apply) {
-        this.baseUrl = baseUrl;
-        this.userName = userName;
-        this.password = password;
-        this.odsFile = odsFile;
-        this.requisition = requisition;
-        this.apply = apply;
-        this.httpClient = RestHelper.createApacheHttpClient(userName, password);
+    public RestCategoryProvisioner(String baseUrl, ApacheHttpClient httpClient, File odsFile, String requisition, Boolean apply) {
+        this.m_baseUrl = baseUrl;
+        this.m_odsFile = odsFile;
+        this.m_requisition = requisition;
+        this.m_apply = apply;
+        this.m_httpClient = httpClient;
     }
 
     public List<RequisitionNode> getRequisitionNodesToUpdate() {
         //create and prepare RestRequisitionManager
-        requisitionManager = new RestRequisitionManager(httpClient, baseUrl);
-        requisitionManager.loadNodesByLabelForRequisition(requisition, "");
+        m_requisitionManager = new RestRequisitionManager(m_httpClient, m_baseUrl);
+        m_requisitionManager.loadNodesByLabelForRequisition(m_requisition, "");
 
         //read node to category mappings from spreadsheet
         SpreadsheetReader spreadsheetReader = new SpreadsheetReader();
-        List<NodeToCategoryMapping> nodeToCategoryMappings = spreadsheetReader.getNodeToCategoryMappingsFromFile(odsFile, requisition);
+        List<NodeToCategoryMapping> nodeToCategoryMappings = spreadsheetReader.getNodeToCategoryMappingsFromFile(m_odsFile, m_requisition);
 
-        List<RequisitionNode> requisitionNodesToUpdate = getRequisitionNodesToUpdate(nodeToCategoryMappings, requisitionManager);
+        List<RequisitionNode> requisitionNodesToUpdate = getRequisitionNodesToUpdate(nodeToCategoryMappings, m_requisitionManager);
 
         return requisitionNodesToUpdate;
     }
@@ -91,7 +84,7 @@ class RestCategoryProvisioner {
         List<RequisitionNode> reqNodesToUpdate = new ArrayList<RequisitionNode>();
 
         for (NodeToCategoryMapping node2Category : nodeToCategoryMappings) {
-            RequisitionNode requisitionNode = requisitionManager.getReqisitionNode(node2Category.getNodeLabel());
+            RequisitionNode requisitionNode = requisitionManager.getRequisitionNode(node2Category.getNodeLabel());
             if (requisitionNode != null) {
 
                 //add all set categories

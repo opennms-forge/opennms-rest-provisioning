@@ -27,6 +27,8 @@
  *******************************************************************************/
 package de.dertak.opennms.restprovisioning;
 
+import com.sun.jersey.client.apache.ApacheHttpClient;
+import de.dertak.opennms.restclientapi.helper.RestHelper;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -41,13 +43,13 @@ public class Starter {
     private static Logger logger = LoggerFactory.getLogger(Starter.class);
 
     @Option(name = "-baseurl", required = true, usage = "baseurl of the system to work with; demo.opennms.com/opennms/")
-    private String baseUrl;
+    private String baseUrl = "http://localhost:8980/opennms/";
 
     @Option(name = "-username", required = true, usage = "username to work with the system")
-    private String userName;
+    private String userName = "admin";
 
     @Option(name = "-password", required = true, usage = "password to work with the system")
-    private String password;
+    private String password = "admin";
 
     @Option(name = "-odsFile", required = true, usage = "path to the odsFile to read from")
     private String odsFilePath;
@@ -73,12 +75,14 @@ public class Starter {
 
         parser.setUsageWidth(TERMINAL_WIDTH);
 
+        ApacheHttpClient httpClient = RestHelper.createApacheHttpClient(userName, password);
+
         logger.info("OpenNMS Category Provisioning");
         try {
             parser.parseArgument(args);
             File odsFile = new File(odsFilePath);
             if (odsFile.exists() && odsFile.canRead()) {
-                RestCategoryProvisioner restCategoryProvisioner = new RestCategoryProvisioner(baseUrl, userName, password, odsFile, requisition, apply);
+                RestCategoryProvisioner restCategoryProvisioner = new RestCategoryProvisioner(baseUrl, httpClient, odsFile, requisition, apply);
                 restCategoryProvisioner.getRequisitionNodesToUpdate();
             }
             else {

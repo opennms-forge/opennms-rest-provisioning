@@ -27,14 +27,17 @@
  *******************************************************************************/
 package de.dertak.opennms.restprovisioning;
 
-import java.io.File;
-import java.util.List;
+import com.sun.jersey.client.apache.ApacheHttpClient;
+import de.dertak.opennms.restclientapi.helper.RestHelper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.List;
 
 /**
  *
@@ -45,28 +48,29 @@ public class RestCategoryProvisionerTest {
 
     private static Logger logger = LoggerFactory.getLogger(RestCategoryProvisionerTest.class);
 
-    private String baseUrl = "http://localhost:8980/opennms/";
+    private String m_baseUrl = "http://localhost:8980/opennms/";
 
-    private String userName = "admin";
+    private String m_userName = "admin";
 
-    private String password = "admin";
+    private String m_password = "admin";
 
-    private File odsFile = new File("/home/tak/test.ods");
+    private File m_odsFile = new File("/home/tak/test.ods");
 
-    private String requisition = "RestProvisioningTest";
+    private String m_requisition = "RestProvisioningTest";
 
-    private boolean apply = false;
+    private boolean m_apply = false;
 
-    private RestCategoryProvisioner provider;
+    private RestCategoryProvisioner m_provider;
 
     @Before
     public void setUp() {
-        provider = new RestCategoryProvisioner(baseUrl, userName, password, odsFile, requisition, apply);
+        ApacheHttpClient apacheHttpClient = RestHelper.createApacheHttpClient(m_userName, m_password);
+        m_provider = new RestCategoryProvisioner(m_baseUrl, apacheHttpClient, m_odsFile, m_requisition, m_apply);
     }
 
     @Test
     public void testDoThings() {
-        List<RequisitionNode> requisitionNodesToUpdate = provider.getRequisitionNodesToUpdate();
+        List<RequisitionNode> requisitionNodesToUpdate = m_provider.getRequisitionNodesToUpdate();
         Assert.assertEquals(4, requisitionNodesToUpdate.size());
     }
 }
