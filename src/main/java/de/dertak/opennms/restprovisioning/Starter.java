@@ -36,6 +36,11 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ *
+ * @author Markus@OpenNMS.org
+ */
+
 public class Starter {
 
     private static Logger logger = LoggerFactory.getLogger(Starter.class);
@@ -58,6 +63,9 @@ public class Starter {
     @Option(name = "-apply", usage = "if this option is set, changes will be applied to the remote system.")
     private boolean apply = false;
 
+    @Option(name = "-generateOds", usage = "if this option is set, just a ods file with the data from the remote system will be created in temp folder.")
+    private boolean generateOds = false;
+
     /**
      * Set maximal terminal width for line breaks
      */
@@ -79,7 +87,11 @@ public class Starter {
             File odsFile = new File(odsFilePath);
             if (odsFile.exists() && odsFile.canRead()) {
                 RestCategoryProvisioner restCategoryProvisioner = new RestCategoryProvisioner(baseUrl, userName, password, odsFile, requisition, apply);
-                restCategoryProvisioner.getRequisitionNodesToUpdate();
+                if(generateOds) {
+                    restCategoryProvisioner.generateOdsFile(requisition);
+                } else {
+                    restCategoryProvisioner.getRequisitionNodesToUpdate();
+                }
             }
             else {
                 logger.info("The odsFile '{}' dose not exist or is not readable, sorry.", odsFilePath);
