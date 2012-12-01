@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import org.opennms.netmgt.provision.persist.requisition.Requisition;
 
 /**
  * @author Markus@OpenNMS.org
@@ -54,7 +55,7 @@ class RestCategoryProvisioner {
 
     private File odsFile;
 
-    private String requisition;
+    private String requisitionName;
 
     private boolean apply = false;
 
@@ -62,28 +63,40 @@ class RestCategoryProvisioner {
 
     private RestRequisitionManager requisitionManager;
 
-    public RestCategoryProvisioner(String baseUrl, String userName, String password, File odsFile, String requisition, Boolean apply) {
+    public RestCategoryProvisioner(String baseUrl, String userName, String password, File odsFile, String requisitionName, Boolean apply) {
         this.baseUrl = baseUrl;
         this.userName = userName;
         this.password = password;
         this.odsFile = odsFile;
-        this.requisition = requisition;
+        this.requisitionName = requisitionName;
         this.apply = apply;
         this.httpClient = RestHelper.createApacheHttpClient(userName, password);
+
+        //create and prepare RestRequisitionManager
+        requisitionManager = new RestRequisitionManager(httpClient, baseUrl);
+        requisitionManager.loadNodesByLabelForRequisition(requisitionName, "");
     }
 
     public List<RequisitionNode> getRequisitionNodesToUpdate() {
-        //create and prepare RestRequisitionManager
-        requisitionManager = new RestRequisitionManager(httpClient, baseUrl);
-        requisitionManager.loadNodesByLabelForRequisition(requisition, "");
-
         //read node to category mappings from spreadsheet
         SpreadsheetReader spreadsheetReader = new SpreadsheetReader();
-        List<NodeToCategoryMapping> nodeToCategoryMappings = spreadsheetReader.getNodeToCategoryMappingsFromFile(odsFile, requisition);
+        List<NodeToCategoryMapping> nodeToCategoryMappings = spreadsheetReader.getNodeToCategoryMappingsFromFile(odsFile, requisitionName);
 
         List<RequisitionNode> requisitionNodesToUpdate = getRequisitionNodesToUpdate(nodeToCategoryMappings, requisitionManager);
 
         return requisitionNodesToUpdate;
+    }
+
+    public void generateOdsFile(String requisitionName) {
+        // read the requisition by using the RestRequisitionManager
+        Requisition requisition = requisitionManager.getRequisition();
+
+        SpreadsheetReader spreadsheetReader = new SpreadsheetReader();
+        spreadsheetReader.getSpeadsheetFromRequisition(requisition);
+
+        // read all categories
+
+        // read all nodes, labels and forenids
     }
 
     private List<RequisitionNode> getRequisitionNodesToUpdate(List<NodeToCategoryMapping> nodeToCategoryMappings, RestRequisitionManager requisitionManager) {
@@ -91,7 +104,7 @@ class RestCategoryProvisioner {
         List<RequisitionNode> reqNodesToUpdate = new ArrayList<RequisitionNode>();
 
         for (NodeToCategoryMapping node2Category : nodeToCategoryMappings) {
-            RequisitionNode requisitionNode = requisitionManager.getReqisitionNode(node2Category.getNodeLabel());
+            RequisitionNode requisitionNode = requisitionManager.getRequisitionNode(node2Category.getNodeLabel());
             if (requisitionNode != null) {
 
                 //add all set categories
