@@ -29,6 +29,7 @@ package de.dertak.opennms.restprovisioning;
 
 import com.sun.jersey.client.apache.ApacheHttpClient;
 import de.dertak.opennms.restclientapi.manager.RestRequisitionManager;
+import org.opennms.netmgt.provision.persist.requisition.Requisition;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionCategory;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionNode;
 import org.slf4j.Logger;
@@ -63,11 +64,11 @@ class RestCategoryProvisioner {
         this.m_requisition = requisition;
         this.m_apply = apply;
         this.m_httpClient = httpClient;
+        this.m_requisitionManager = new RestRequisitionManager(m_httpClient, m_baseUrl);
     }
 
     public List<RequisitionNode> getRequisitionNodesToUpdate() {
         //create and prepare RestRequisitionManager
-        m_requisitionManager = new RestRequisitionManager(m_httpClient, m_baseUrl);
         m_requisitionManager.loadNodesByLabelForRequisition(m_requisition, "");
 
         //read node to category mappings from spreadsheet
@@ -77,6 +78,18 @@ class RestCategoryProvisioner {
         List<RequisitionNode> requisitionNodesToUpdate = getRequisitionNodesToUpdate(nodeToCategoryMappings, m_requisitionManager);
 
         return requisitionNodesToUpdate;
+    }
+
+    public void generateOdsFile(String requisitionName) {
+        // read the requisition by using the RestRequisitionManager
+        Requisition requisition = m_requisitionManager.getRequisition();
+
+        SpreadsheetReader spreadsheetReader = new SpreadsheetReader();
+        spreadsheetReader.getSpeadsheetFromRequisition(requisition);
+
+        // read all categories
+
+        // read all nodes, labels and forenids
     }
 
     private List<RequisitionNode> getRequisitionNodesToUpdate(List<NodeToCategoryMapping> nodeToCategoryMappings, RestRequisitionManager requisitionManager) {

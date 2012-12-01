@@ -73,4 +73,9 @@ public class RestCategoryProvisionerTest {
         List<RequisitionNode> requisitionNodesToUpdate = m_provider.getRequisitionNodesToUpdate();
         Assert.assertEquals(4, requisitionNodesToUpdate.size());
     }
+
+    @Test
+    public void testGenerateOdsFile() {
+        m_provider.generateOdsFile(m_requisition);
+    }
 }
