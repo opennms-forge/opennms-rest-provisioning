@@ -28,7 +28,6 @@
 package de.dertak.opennms.restprovisioning;
 
 import com.sun.jersey.client.apache.ApacheHttpClient;
-import de.dertak.opennms.restclientapi.helper.RestConnectionParameter;
 import de.dertak.opennms.restclientapi.manager.RestRequisitionManager;
 import org.opennms.netmgt.provision.persist.requisition.Requisition;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionCategory;
@@ -85,12 +84,18 @@ class RestCategoryProvisioner {
     /**
      * Constructor to initialize the ReST category provisioner.
      *
-     * @param odsFile       File handle to ODS file with nodes and categories which have to be set as {@link java.io.File}
-     * @param foreignSource Name of the requisition which has to be updated
-     * @param apply         Flag for preview or directly apply changes in OpenNMS and synchronize the OpenNMS database
+     * @param baseUrl         Base URL to OpenNMS ReST services as {@link java.lang.String}
+     * @param httpClient      Client to handle ReST calls as {@link com.sun.jersey.client.apache.ApacheHttpClient}
+     * @param odsFile         File handle to ODS file with nodes and categories which have to be set as {@link java.io.File}
+     * @param foreignSource   Name of the foreign source which has to be updated
+     * @param apply           Flag for preview or directly apply changes in OpenNMS and synchronize the OpenNMS database
      */
-    public RestCategoryProvisioner(RestConnectionParameter restConnectionParameter, File odsFile, String foreignSource, Boolean apply) {
-        this.m_httpClient = null;
+    public RestCategoryProvisioner(String baseUrl, ApacheHttpClient httpClient, File odsFile, String foreignSource, Boolean apply) {
+        this.m_baseUrl = baseUrl;
+        this.m_odsFile = odsFile;
+        this.m_foreignSource = foreignSource;
+        this.m_apply = apply;
+        this.m_httpClient = httpClient;
         this.m_restRequisitionManager = new RestRequisitionManager(m_httpClient, m_baseUrl);
     }
 

@@ -28,8 +28,6 @@
 package de.dertak.opennms.restprovisioning;
 
 import com.sun.jersey.client.apache.ApacheHttpClient;
-import de.dertak.opennms.restclientapi.helper.OnmsRestConnectionParameter;
-import de.dertak.opennms.restclientapi.helper.RestConnectionParameter;
 import de.dertak.opennms.restclientapi.helper.RestHelper;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -39,9 +37,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 
 /**
+ *
  * @author Markus@OpenNMS.org
  */
 
@@ -53,7 +51,7 @@ public class Starter {
     private String baseUrl = "http://localhost:8980/opennms/";
 
     @Option(name = "-username", required = true, usage = "username to work with the system")
-    private String username = "admin";
+    private String userName = "admin";
 
     @Option(name = "-password", required = true, usage = "password to work with the system")
     private String password = "admin";
@@ -75,8 +73,6 @@ public class Starter {
      */
     private final int TERMINAL_WIDTH = 120;
 
-    private RestConnectionParameter m_resRestConnectionParameter = null;
-
     public static void main(String[] args) throws IOException {
         new Starter().doMain(args);
     }
@@ -87,14 +83,7 @@ public class Starter {
 
         parser.setUsageWidth(TERMINAL_WIDTH);
 
-        try {
-            m_resRestConnectionParameter = new OnmsRestConnectionParameter(baseUrl, username, password);
-        } catch (MalformedURLException e) {
-            logger.error("Base URL '{}' is not valid. Error message '{}'", baseUrl, e.getMessage());
-            System.exit(1);
-        }
-
-        ApacheHttpClient httpClient = RestHelper.createApacheHttpClient(username, password);
+        ApacheHttpClient httpClient = RestHelper.createApacheHttpClient(userName, password);
 
         logger.info("OpenNMS Category Provisioning");
         try {
@@ -102,10 +91,9 @@ public class Starter {
             File odsFile = new File(odsFilePath);
             if (odsFile.exists() && odsFile.canRead()) {
                 RestCategoryProvisioner restCategoryProvisioner = new RestCategoryProvisioner(baseUrl, httpClient, odsFile, requisition, apply);
-                if (generateOds) {
+                if(generateOds) {
                     restCategoryProvisioner.generateOdsFile(requisition);
-                }
-                else {
+                } else {
                     restCategoryProvisioner.getRequisitionNodesToUpdate();
                 }
             }
