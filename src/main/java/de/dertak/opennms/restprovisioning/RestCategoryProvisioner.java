@@ -64,7 +64,7 @@ class RestCategoryProvisioner {
     /**
      * Name of the provisioning requisition
      */
-    private String m_requisitionName;
+    private String m_foreignSource;
 
     /**
      * Default do not apply the new categories on the node, give a feedback for
@@ -80,18 +80,18 @@ class RestCategoryProvisioner {
     /**
      * Contains the nodes from OpenNMS and provides access to the requisition node
      */
-    private RestRequisitionManager m_requisitionManager;
+    private RestRequisitionManager m_restRequisitionManager;
 
     /**
      * Constructor to initialize the ReST category provisioner.
      *
-     * @param odsFile         File handle to ODS file with nodes and categories which have to be set as {@link java.io.File}
-     * @param requisitionName Name of the requisition which has to be updated
-     * @param apply           Flag for preview or directly apply changes in OpenNMS and synchronize the OpenNMS database
+     * @param odsFile       File handle to ODS file with nodes and categories which have to be set as {@link java.io.File}
+     * @param foreignSource Name of the requisition which has to be updated
+     * @param apply         Flag for preview or directly apply changes in OpenNMS and synchronize the OpenNMS database
      */
-    public RestCategoryProvisioner(RestConnectionParameter restConnectionParameter, File odsFile, String requisitionName, Boolean apply) {
+    public RestCategoryProvisioner(RestConnectionParameter restConnectionParameter, File odsFile, String foreignSource, Boolean apply) {
         this.m_httpClient = null;
-        this.m_requisitionManager = new RestRequisitionManager(m_httpClient, m_baseUrl);
+        this.m_restRequisitionManager = new RestRequisitionManager(m_httpClient, m_baseUrl);
     }
 
     /**
@@ -104,13 +104,13 @@ class RestCategoryProvisioner {
      */
     public List<RequisitionNode> getRequisitionNodesToUpdate() {
         //create and prepare RestRequisitionManager
-        m_requisitionManager.loadNodesByLabelForRequisition(m_requisitionName, "");
+        m_restRequisitionManager.loadNodesByLabelForRequisition(m_foreignSource, "");
 
         //read node to category mappings from spreadsheet
         SpreadsheetReader spreadsheetReader = new SpreadsheetReader();
-        List<NodeToCategoryMapping> nodeToCategoryMappings = spreadsheetReader.getNodeToCategoryMappingsFromFile(m_odsFile, m_requisitionName);
+        List<NodeToCategoryMapping> nodeToCategoryMappings = spreadsheetReader.getNodeToCategoryMappingsFromFile(m_odsFile, m_foreignSource);
 
-        List<RequisitionNode> requisitionNodesToUpdate = getRequisitionNodesToUpdate(nodeToCategoryMappings, m_requisitionManager);
+        List<RequisitionNode> requisitionNodesToUpdate = getRequisitionNodesToUpdate(nodeToCategoryMappings, m_restRequisitionManager);
 
         return requisitionNodesToUpdate;
     }
@@ -122,15 +122,15 @@ class RestCategoryProvisioner {
      * return a list of requisition nodes.
      *
      * @param nodeToCategoryMappings Mapping from nodes and surveillance categories {@link java.util.List<RequisitionNode>}
-     * @param requisitionManager Requisition manager handles the node representation from OpenNMS
+     * @param restRequisitionManager Requisition manager handles the node representation from OpenNMS
      * @return List of nodes which has to be provisioned as {@link java.util.List<RequisitionNode>}
      */
-    private List<RequisitionNode> getRequisitionNodesToUpdate(List<NodeToCategoryMapping> nodeToCategoryMappings, RestRequisitionManager requisitionManager) {
+    private List<RequisitionNode> getRequisitionNodesToUpdate(List<NodeToCategoryMapping> nodeToCategoryMappings, RestRequisitionManager restRequisitionManager) {
 
         List<RequisitionNode> reqNodesToUpdate = new ArrayList<RequisitionNode>();
 
         for (NodeToCategoryMapping node2Category : nodeToCategoryMappings) {
-            RequisitionNode requisitionNode = requisitionManager.getRequisitionNode(node2Category.getNodeLabel());
+            RequisitionNode requisitionNode = restRequisitionManager.getRequisitionNode(node2Category.getNodeLabel());
             if (requisitionNode != null) {
 
                 //add all set categories
@@ -149,14 +149,12 @@ class RestCategoryProvisioner {
                 //compare amount of categories per step to identify changed requisition nodes
                 if (initialAmountOfCategories.equals(afterAddingAmountOfCategories) && afterAddingAmountOfCategories.equals(afterRemoveAmountOfCategories)) {
                     logger.info("RequisitionNode '{}' has no updates", requisitionNode.getNodeLabel());
-                }
-                else {
+                } else {
                     logger.info("RequisitionNode '{}' has updates", requisitionNode.getNodeLabel());
                     reqNodesToUpdate.add(requisitionNode);
                 }
 
-            }
-            else {
+            } else {
                 logger.info("RequisitionNode '{}' is unknown on the system", node2Category.nodeLabel);
             }
         }
@@ -177,11 +175,11 @@ class RestCategoryProvisioner {
      * TODO: Read all categories
      * TODO: Read all nodes, labels and foreign-ids
      *
-     * @param requisitionName Name of provisioning requisition to generate the ODS file
+     * @param foreignSource Name of provisioning requisition to generate the ODS file
      */
-    public void generateOdsFile(String requisitionName) {
+    public void generateOdsFile(String foreignSource) {
         // read the requisition by using the RestRequisitionManager
-        Requisition requisition = m_requisitionManager.getRequisition();
+        Requisition requisition = m_restRequisitionManager.getRequisition();
 
         SpreadsheetReader spreadsheetReader = new SpreadsheetReader();
         spreadsheetReader.getSpeadsheetFromRequisition(requisition);

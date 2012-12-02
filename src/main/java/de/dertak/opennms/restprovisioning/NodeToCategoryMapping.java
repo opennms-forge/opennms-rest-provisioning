@@ -33,13 +33,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author Markus@OpenNMS.com
  */
 public class NodeToCategoryMapping {
     String nodeLabel;
     List<RequisitionCategory> addCategories = new ArrayList<RequisitionCategory>();
     List<RequisitionCategory> removeCategories = new ArrayList<RequisitionCategory>();
+
     public NodeToCategoryMapping(String nodeLabel) {
         this.nodeLabel = nodeLabel;
     }

@@ -20,13 +20,6 @@
  */
 package de.dertak.opennms.restprovisioning;
 
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
 import org.odftoolkit.odfdom.doc.table.OdfTable;
 import org.odftoolkit.odfdom.doc.table.OdfTableColumn;
@@ -37,8 +30,10 @@ import org.opennms.netmgt.provision.persist.requisition.RequisitionCategory;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionNode;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.util.*;
+
 /**
- *
  * @author Markus@OpenNMS.org
  */
 public class SpreadsheetReader {
@@ -124,14 +119,14 @@ public class SpreadsheetReader {
             writeNodesIntoSheet(categoryTable, reqNodes, categories);
 
             spreadsheet.save(new File(System.getProperty("java.io.tmpdir") + File.separator + requisition.getForeignSource() + ".ods"));
-            
+
         } catch (Exception ex) {
             logger.error("Building Spreadsheet went wrong", ex);
         }
     }
 
-    private void writeCategoriesIntoSheet(OdfTableRow categoryRow, Set<String> categories, String requisitionName) {
-        categoryRow.getCellByIndex(0).setDisplayText(requisitionName);
+    private void writeCategoriesIntoSheet(OdfTableRow categoryRow, Set<String> categories, String foreignSource) {
+        categoryRow.getCellByIndex(0).setDisplayText(foreignSource);
         int categoryCellIndex = 1;
         for (String category : categories) {
             categoryRow.getCellByIndex(categoryCellIndex).setDisplayText(category);
