@@ -38,8 +38,10 @@ import org.opennms.netmgt.provision.persist.requisition.RequisitionCategory;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionNode;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.util.*;
+
 /**
- *
  * @author Markus@OpenNMS.org
  */
 public class SpreadsheetReader {
@@ -136,8 +138,8 @@ public class SpreadsheetReader {
         return odsOutFile;
     }
 
-    private void writeCategoriesIntoSheet(OdfTableRow categoryRow, Set<String> categories, String requisitionName) {
-        categoryRow.getCellByIndex(0).setDisplayText(requisitionName);
+    private void writeCategoriesIntoSheet(OdfTableRow categoryRow, Set<String> categories, String foreignSource) {
+        categoryRow.getCellByIndex(0).setDisplayText(foreignSource);
         int categoryCellIndex = 1;
         for (String category : categories) {
             categoryRow.getCellByIndex(categoryCellIndex).setDisplayText(category);
