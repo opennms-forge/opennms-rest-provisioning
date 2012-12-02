@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
+import org.junit.Ignore;
 
 /**
  *
@@ -68,14 +69,10 @@ public class RestCategoryProvisionerTest {
         m_provider = new RestCategoryProvisioner(m_baseUrl, apacheHttpClient, m_odsFile, m_requisition, m_apply);
     }
 
+    @Ignore
     @Test
     public void testDoThings() {
         List<RequisitionNode> requisitionNodesToUpdate = m_provider.getRequisitionNodesToUpdate();
         Assert.assertEquals(4, requisitionNodesToUpdate.size());
-    }
-
-    @Test
-    public void testGenerateOdsFile() {
-        m_provider.generateOdsFile(m_requisition);
     }
 }

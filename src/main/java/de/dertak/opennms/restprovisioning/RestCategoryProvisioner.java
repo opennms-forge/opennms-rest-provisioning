@@ -29,6 +29,7 @@ package de.dertak.opennms.restprovisioning;
 
 import com.sun.jersey.client.apache.ApacheHttpClient;
 import de.dertak.opennms.restclientapi.manager.RestRequisitionManager;
+import de.dertak.opennms.restprovisioning.helper.SpreadsheetLayouter;
 import org.opennms.netmgt.provision.persist.requisition.Requisition;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionCategory;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionNode;
@@ -189,10 +190,11 @@ class RestCategoryProvisioner {
         Requisition requisition = m_requisitionManager.getRequisition();
 
         SpreadsheetReader spreadsheetReader = new SpreadsheetReader();
-        spreadsheetReader.getSpeadsheetFromRequisition(requisition);
+        File generatedOdsFile = spreadsheetReader.getSpeadsheetFromRequisition(requisition);
+        File formattedOdsFile = SpreadsheetLayouter.layoutGeneratedOdsFile(generatedOdsFile);
+
 
         // read all categories
-
         // read all nodes, labels and foreign-ids
     }
 }

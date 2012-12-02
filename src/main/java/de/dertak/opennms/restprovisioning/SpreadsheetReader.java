@@ -21,6 +21,7 @@
 package de.dertak.opennms.restprovisioning;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -93,13 +94,16 @@ public class SpreadsheetReader {
         return nodes;
     }
 
-    public void getSpeadsheetFromRequisition(Requisition requisition) {
+    public File getSpeadsheetFromRequisition(Requisition requisition) {
+        File odsOutFile = new File(System.getProperty("java.io.tmpdir") + File.separator + requisition.getForeignSource() + ".ods");
         try {
-            OdfSpreadsheetDocument spreadsheet = OdfSpreadsheetDocument.newSpreadsheetDocument();
+            InputStream template = this.getClass().getClassLoader().getResourceAsStream("template.ods");
+//            OdfSpreadsheetDocument spreadsheet = OdfSpreadsheetDocument.loadDocument("src/main/resources/template.ods");
+            OdfSpreadsheetDocument spreadsheet = OdfSpreadsheetDocument.loadDocument(template);
             OdfTable thresholdTable = spreadsheet.getTableList().get(0);
             thresholdTable.setTableName(requisition.getForeignSource() + " " + "TH");
 
-            OdfTable categoryTable = OdfTable.newTable(spreadsheet);
+            OdfTable categoryTable = spreadsheet.getTableList().get(1);
             categoryTable.setTableName(requisition.getForeignSource() + " " + "CATEGORIES");
 
             Map<String, RequisitionNode> reqNodes = new TreeMap<String, RequisitionNode>();
@@ -123,11 +127,13 @@ public class SpreadsheetReader {
             writeCategoriesIntoSheet(categoryTable.getRowByIndex(0), categories, requisition.getForeignSource());
             writeNodesIntoSheet(categoryTable, reqNodes, categories);
 
-            spreadsheet.save(new File(System.getProperty("java.io.tmpdir") + File.separator + requisition.getForeignSource() + ".ods"));
-            
+            spreadsheet.save(odsOutFile);
+            logger.info("saved '{}'", odsOutFile);
+
         } catch (Exception ex) {
             logger.error("Building Spreadsheet went wrong", ex);
         }
+        return odsOutFile;
     }
 
     private void writeCategoriesIntoSheet(OdfTableRow categoryRow, Set<String> categories, String requisitionName) {
@@ -145,11 +151,13 @@ public class SpreadsheetReader {
         int nodeCellIndex = 1;
         for (RequisitionNode reqNode : reqNodes.values()) {
             nodeColumn.getCellByIndex(nodeCellIndex).setDisplayText(reqNode.getNodeLabel());
-            for (int categoryIndex = 1; categoryIndex <= categories.size(); categoryIndex++) {
-                if (reqNode.getCategories().contains(new RequisitionCategory(categoryRow.getCellByIndex(categoryIndex).getDisplayText()))) {
-                    table.getRowByIndex(nodeCellIndex).getCellByIndex(categoryIndex).setDisplayText("X");
-                } else {
-                    table.getRowByIndex(nodeCellIndex).getCellByIndex(categoryIndex).setDisplayText("");
+            if (categories.size() > 0) {
+                for (int categoryIndex = 1; categoryIndex <= categories.size(); categoryIndex++) {
+                    if (reqNode.getCategories().contains(new RequisitionCategory(categoryRow.getCellByIndex(categoryIndex).getDisplayText()))) {
+                        table.getRowByIndex(nodeCellIndex).getCellByIndex(categoryIndex).setDisplayText("X");
+                    } else {
+                        table.getRowByIndex(nodeCellIndex).getCellByIndex(categoryIndex).setDisplayText("");
+                    }
                 }
             }
             nodeCellIndex++;
