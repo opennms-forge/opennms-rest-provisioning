@@ -185,6 +185,7 @@ class RestCategoryProvisioner {
      */
     public void generateOdsFile(String foreignSource) {
         // read the requisition by using the RestRequisitionManager
+        m_restRequisitionManager.loadNodesByLabelForRequisition(foreignSource, "");
         Requisition requisition = m_restRequisitionManager.getRequisition();
 
         SpreadsheetReader spreadsheetReader = new SpreadsheetReader();

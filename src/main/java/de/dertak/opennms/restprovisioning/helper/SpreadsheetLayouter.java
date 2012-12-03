@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
  * @author Markus@OpenNMS.org
  */
 public class SpreadsheetLayouter {
+
     private static org.slf4j.Logger logger = LoggerFactory.getLogger(SpreadsheetLayouter.class);
 
     public static File layoutGeneratedOdsFile(File generatedOdsFile) {

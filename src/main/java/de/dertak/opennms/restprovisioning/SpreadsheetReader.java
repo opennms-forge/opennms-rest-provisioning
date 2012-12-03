@@ -20,7 +20,6 @@
  */
 package de.dertak.opennms.restprovisioning;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +38,6 @@ import org.opennms.netmgt.provision.persist.requisition.RequisitionNode;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.*;
 
 /**
  * @author Markus@OpenNMS.org
@@ -97,10 +95,13 @@ public class SpreadsheetReader {
     }
 
     public File getSpeadsheetFromRequisition(Requisition requisition) {
+        if (requisition == null) {
+            logger.error("Requisition was null");
+            return null;
+        }
         File odsOutFile = new File(System.getProperty("java.io.tmpdir") + File.separator + requisition.getForeignSource() + ".ods");
         try {
             InputStream template = this.getClass().getClassLoader().getResourceAsStream("template.ods");
-//            OdfSpreadsheetDocument spreadsheet = OdfSpreadsheetDocument.loadDocument("src/main/resources/template.ods");
             OdfSpreadsheetDocument spreadsheet = OdfSpreadsheetDocument.loadDocument(template);
             OdfTable thresholdTable = spreadsheet.getTableList().get(0);
             thresholdTable.setTableName(requisition.getForeignSource() + " " + "TH");
