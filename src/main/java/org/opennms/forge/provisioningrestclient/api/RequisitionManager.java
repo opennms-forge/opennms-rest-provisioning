@@ -97,4 +97,15 @@ public class RequisitionManager {
     public Requisition getRequisition() {
         return m_requisition;
     }
+
+    /**
+     * <p>getRestRequisitionProvider</p>
+     * <p/>
+     * Get the ReST requisition provider to use ReST calls
+     *
+     * @return ReST requisition provider as {@link org.opennms.forge.restclient.api.RestRequisitionProvider}
+     */
+    public RestRequisitionProvider getRestRequisitionProvider() {
+        return this.m_restRequisitionProvider;
+    }
 }
