@@ -25,54 +25,52 @@
  *     http://www.opennms.org/
  *     http://www.opennms.com/
  *******************************************************************************/
-package de.dertak.opennms.restprovisioning;
+package org.opennms.forge.provisioningrestclient.api;
 
-import com.sun.jersey.client.apache.ApacheHttpClient;
-import de.dertak.opennms.restclientapi.helper.RestHelper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.opennms.forge.restclient.utils.OnmsRestConnectionParameter;
+import org.opennms.forge.restclient.utils.RestConnectionParameter;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.util.List;
-import org.junit.Ignore;
+import java.net.MalformedURLException;
 
 /**
+ * <p>RequisitionManagerTest class.</p>
  *
- * @author Markus@OpenNMS.org
+ * @author <a href="mailto:markus@opennms.org">Markus Neumann</a>*
+ * @author <a href="mailto:ronny@opennms.org">Ronny Trommer</a>
+ * @version 1.0-SNAPSHOT
+ * @since 1.0-SNAPSHOT
  */
+public class RequisitionManagerTest {
 
-public class RestCategoryProvisionerTest {
+    private static Logger logger = LoggerFactory.getLogger(RequisitionManagerTest.class);
 
-    private static Logger logger = LoggerFactory.getLogger(RestCategoryProvisionerTest.class);
+    private String baseUrl = "http://localhost:8980/opennms/";
+    private String username = "admin";
+    private String password = "admin";
 
-    private String m_baseUrl = "http://localhost:8980/opennms/";
-
-    private String m_userName = "admin";
-
-    private String m_password = "admin";
-
-    private File m_odsFile = new File("/home/tak/test.ods");
-
-    private String m_requisition = "RestProvisioningTest";
-
-    private boolean m_apply = false;
-
-    private RestCategoryProvisioner m_provider;
+    private RequisitionManager m_manager;
 
     @Before
-    public void setUp() {
-        ApacheHttpClient apacheHttpClient = RestHelper.createApacheHttpClient(m_userName, m_password);
-        m_provider = new RestCategoryProvisioner(m_baseUrl, apacheHttpClient, m_odsFile, m_requisition, m_apply);
+    public void setup() {
+        try {
+            RestConnectionParameter restConnectionParameter = new OnmsRestConnectionParameter(baseUrl, username, password);
+            m_manager = new RequisitionManager(restConnectionParameter);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
     }
 
-    @Ignore
     @Test
-    public void testDoThings() {
-        List<RequisitionNode> requisitionNodesToUpdate = m_provider.getRequisitionNodesToUpdate();
-        Assert.assertEquals(4, requisitionNodesToUpdate.size());
+    public void testSomeMethod() {
+        m_manager.loadNodesByLabelForRequisition("Amazon", "");
+        RequisitionNode reqNode = m_manager.getRequisitionNode("TestNode");
+        Assert.assertNotNull(reqNode);
     }
 }

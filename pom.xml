@@ -2,12 +2,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.dertak.opennms</groupId>
-    <artifactId>RestProvisioning</artifactId>
+    <groupId>org.opennms.forge</groupId>
+    <artifactId>opennms-provisioning-rest-client-api</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>RestProvisioning</name>
+    <name>opennms-provisioning-rest-client-api</name>
     <url>http://www.opennms.org</url>
 
     <properties>
@@ -15,50 +15,12 @@
     </properties>
 
     <dependencies>
-        <!-- OpenNMS Rest Client Api Sample -->
         <dependency>
-            <groupId>de.dertak.opennms</groupId>
-            <artifactId>RestClientApi</artifactId>
+            <groupId>org.opennms.forge</groupId>
+            <artifactId>opennms-rest-client-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-
-        <!-- OpenDocument API for ODS -->
-        <dependency>
-            <groupId>org.odftoolkit</groupId>
-            <artifactId>odfdom-java</artifactId>
-            <version>0.8.7</version>
-        </dependency>
-        
-        <!-- Command Line Interface -->    
-        <dependency>
-            <groupId>args4j</groupId>
-            <artifactId>args4j</artifactId>
-            <version>2.0.16</version>
-        </dependency>
-        
-        <!-- Logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.2</version>
-            <type>jar</type>
-        </dependency>
-        
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.0.7</version>
-        </dependency>
-        
-        <!-- Testing -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-        
     <build>
         <plugins>
             <plugin>
@@ -70,30 +32,7 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>de.dertak.opennms.restprovisioning.Starter</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                        <phase>package</phase> <!-- bind to the packaging phase -->
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
-    
+
 </project>
