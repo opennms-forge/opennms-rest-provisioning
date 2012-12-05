@@ -69,7 +69,7 @@ public class RequisitionManagerTest {
 
     @Test
     public void testSomeMethod() {
-        m_manager.loadNodesByLabelForRequisition("Amazon", "");
+        m_manager.preLoadRequisition("Amazon", "");
         RequisitionNode reqNode = m_manager.getRequisitionNode("TestNode");
         Assert.assertNotNull(reqNode);
     }

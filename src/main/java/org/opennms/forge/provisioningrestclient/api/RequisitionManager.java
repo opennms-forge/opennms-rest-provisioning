@@ -20,15 +20,16 @@
  */
 package org.opennms.forge.provisioningrestclient.api;
 
-import com.sun.jersey.client.apache.ApacheHttpClient;
+import java.util.Collection;
 import org.opennms.forge.restclient.api.RestRequisitionProvider;
 import org.opennms.forge.restclient.utils.RestConnectionParameter;
-import org.opennms.forge.restclient.utils.RestHelper;
 import org.opennms.netmgt.provision.persist.requisition.Requisition;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionNode;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>RequisitionManager class.</p>
@@ -37,12 +38,10 @@ import java.util.Map;
  * @author <a href="mailto:ronny@opennms.org">Ronny Trommer</a>
  * @version 1.0-SNAPSHOT
  * @since 1.0-SNAPSHOT
- *        <p/>
- *        TODO tak: missing structure that adds the requisition for the nodes
  */
 public class RequisitionManager {
 
-    private ApacheHttpClient m_httpClient = null;
+    private static Logger logger = LoggerFactory.getLogger(RequisitionManager.class);
     private Map<String, RequisitionNode> m_reqNodesByLabel = new HashMap<String, RequisitionNode>();
     private RestRequisitionProvider m_restRequisitionProvider;
     private Requisition m_requisition;
@@ -52,29 +51,49 @@ public class RequisitionManager {
      * <p/>
      * Constructor to handle the data structure for an OpenNMS provisioning ReST service.
      *
-     * @param restConnectionParameter Connection parameter for HTTP ReST cliet
+     * @param restConnectionParameter Connection parameter for HTTP ReST client
+     * @param foreignSource Name of the requisition as {@link java.lang.String}
      */
-    public RequisitionManager(RestConnectionParameter restConnectionParameter) {
-        this.m_httpClient = RestHelper.createApacheHttpClient(restConnectionParameter);
+    public RequisitionManager(RestConnectionParameter restConnectionParameter, String foreignSource) {
         m_restRequisitionProvider = new RestRequisitionProvider(restConnectionParameter);
+        preLoadRequisition(foreignSource);
     }
 
     /**
-     * <p>loadNodesByLabelForRequisition</p>
+     * <p>preLoadRequisition</p>
      * <p/>
-     * Load nodes from a given requisition identified by foreign source and store the nodes
-     * in internal requisition with a filter or limit as parameter string.
-     *
+     * Load a given requisition identified by foreign source and stores it for later use.
+     * Without this preLoad the most operations will fail.
      * @param foreignSource Name of the requisition as {@link java.lang.String}
-     * @param parameter     Filter or limit parameter as {@link java.lang.String}
      */
-    public void loadNodesByLabelForRequisition(String foreignSource, String parameter) {
-        m_requisition = m_restRequisitionProvider.getRequisition(foreignSource, parameter);
+    private void preLoadRequisition(String foreignSource) {
+        m_requisition = m_restRequisitionProvider.getRequisition(foreignSource, "");
         for (RequisitionNode reqNode : m_requisition.getNodes()) {
             m_reqNodesByLabel.put(reqNode.getNodeLabel(), reqNode);
         }
     }
 
+    public void sendManagedRequisitionToOpenNMS() {
+        logger.info("Updating Requisition '{}'", m_requisition.getForeignSource());
+        m_restRequisitionProvider.pushRequisition(m_requisition);
+    }
+
+    public void sendManagedRequisitionToOpenNMS(Collection<RequisitionNode> requisitionNodes) {
+        for (RequisitionNode reqNode : requisitionNodes) {
+            if(m_reqNodesByLabel.containsKey(reqNode.getNodeLabel())) {
+                logger.info("Send Node '{}' of the Requisition '{}' to OpenNMS", reqNode.getNodeLabel(), m_requisition.getForeignSource());
+                m_restRequisitionProvider.pushNodeToRequisition(m_requisition.getForeignSource(), reqNode);
+            } else {
+                logger.info("Node '{}' is not part of the Requisition '{}'", reqNode.getNodeLabel(), m_requisition.getForeignSource());
+            }
+        }
+    }
+
+    public void synchronizeManagedRequisitionOnOpenNMS() {
+        logger.info("synchronizing Requisition '{}' on OpenNMS", m_requisition.getForeignSource());
+        m_restRequisitionProvider.synchronizeRequisition(m_requisition.getForeignSource());
+    }
+    
     /**
      * <p>getRequisitionNode</p>
      * <p/>
