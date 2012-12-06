@@ -60,7 +60,7 @@ public class RequisitionManagerTest {
     public void setup() {
         try {
             RestConnectionParameter restConnectionParameter = new OnmsRestConnectionParameter(baseUrl, username, password);
-            m_manager = new RequisitionManager(restConnectionParameter);
+            m_manager = new RequisitionManager(restConnectionParameter, "TestRequisition");
         } catch (MalformedURLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -69,7 +69,6 @@ public class RequisitionManagerTest {
 
     @Test
     public void testSomeMethod() {
-        m_manager.preLoadRequisition("Amazon", "");
         RequisitionNode reqNode = m_manager.getRequisitionNode("TestNode");
         Assert.assertNotNull(reqNode);
     }
