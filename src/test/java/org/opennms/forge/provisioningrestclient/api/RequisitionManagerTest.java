@@ -81,7 +81,7 @@ public class RequisitionManagerTest {
     @Test
     @Ignore
     public void testSyncronizeRequisition() {
-        RequisitionCategory testCategory = new RequisitionCategory("TestSuperTolleCategory");
+        RequisitionCategory testCategory = new RequisitionCategory("2");
         Requisition requisition = m_manager.getRequisition();
         RequisitionNode requisitionNode = requisition.getNode("TestNode");
         requisitionNode.getCategories().add(testCategory);

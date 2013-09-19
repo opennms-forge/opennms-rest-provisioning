@@ -21,6 +21,7 @@
 package org.opennms.forge.provisioningrestclient.api;
 
 import java.util.Collection;
+import java.util.Date;
 import org.opennms.forge.restclient.api.RestRequisitionProvider;
 import org.opennms.forge.restclient.utils.RestConnectionParameter;
 import org.opennms.netmgt.provision.persist.requisition.Requisition;
@@ -75,11 +76,13 @@ public class RequisitionManager {
 
     public void sendManagedRequisitionToOpenNMS() {
         logger.info("Updating Requisition '{}'", m_requisition.getForeignSource());
+        m_requisition.setDate(new Date());
         m_restRequisitionProvider.pushRequisition(m_requisition);
     }
 
     public void sendManagedRequisitionToOpenNMS(Collection<RequisitionNode> requisitionNodes) {
         for (RequisitionNode reqNode : requisitionNodes) {
+            m_requisition.setDate(new Date());
             if(m_reqNodesByLabel.containsKey(reqNode.getNodeLabel())) {
                 logger.info("Send Node '{}' of the Requisition '{}' to OpenNMS", reqNode.getNodeLabel(), m_requisition.getForeignSource());
                 m_restRequisitionProvider.pushNodeToRequisition(m_requisition.getForeignSource(), reqNode);
