@@ -37,6 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
+import org.junit.Ignore;
+import org.opennms.netmgt.provision.persist.requisition.Requisition;
+import org.opennms.netmgt.provision.persist.requisition.RequisitionCategory;
 
 /**
  * <p>RequisitionManagerTest class.</p>
@@ -55,21 +58,40 @@ public class RequisitionManagerTest {
     private String password = "admin";
 
     private RequisitionManager m_manager;
-
+    private RestConnectionParameter restConnectionParameter;
+    
+    
     @Before
     public void setup() {
         try {
-            RestConnectionParameter restConnectionParameter = new OnmsRestConnectionParameter(baseUrl, username, password);
+            restConnectionParameter = new OnmsRestConnectionParameter(baseUrl, username, password);
             m_manager = new RequisitionManager(restConnectionParameter, "TestRequisition");
         } catch (MalformedURLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error("baseUrl is malformed", e);
         }
-
     }
 
     @Test
-    public void testSomeMethod() {
+    @Ignore
+    public void testReadingNodeFromRequisition() {
         RequisitionNode reqNode = m_manager.getRequisitionNode("TestNode");
         Assert.assertNotNull(reqNode);
+    }
+    
+    @Test
+    @Ignore
+    public void testSyncronizeRequisition() {
+        RequisitionCategory testCategory = new RequisitionCategory("TestSuperTolleCategory");
+        Requisition requisition = m_manager.getRequisition();
+        RequisitionNode requisitionNode = requisition.getNode("TestNode");
+        requisitionNode.getCategories().add(testCategory);
+        m_manager.sendManagedRequisitionToOpenNMS(requisition.getNodes());
+        m_manager.synchronizeManagedRequisitionOnOpenNMS();
+    }
+    
+    @Test
+    @Ignore
+    public void testAddingCategoryToNode() {
+        
     }
 }

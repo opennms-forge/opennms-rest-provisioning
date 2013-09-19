@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 public class RequisitionManager {
 
     private static Logger logger = LoggerFactory.getLogger(RequisitionManager.class);
-    private Map<String, RequisitionNode> m_reqNodesByLabel = new HashMap<String, RequisitionNode>();
+    private Map<String, RequisitionNode> m_reqNodesByLabel = new HashMap<>();
     private RestRequisitionProvider m_restRequisitionProvider;
     private Requisition m_requisition;
 
